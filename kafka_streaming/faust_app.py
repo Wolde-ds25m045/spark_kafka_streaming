@@ -1,3 +1,4 @@
+
 from pathlib import Path
 
 import faust
@@ -6,7 +7,7 @@ from faust_music_events import MusicEvent
 from utils.faust_helpers import build_app_kwargs, ensure_faust_topics, load_kafka_config
 
 CONFIG_FILE = Path(__file__).with_name("kafka.config")
-APP_ID = "music_stream_processor"
+APP_ID = "music_stream_processor_mo"
 SOURCE_TOPIC = "music-fhtw"
 
 kafka_app_config = load_kafka_config(CONFIG_FILE)

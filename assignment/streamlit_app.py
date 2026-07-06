@@ -355,6 +355,10 @@ def main():
                     st.session_state.action_count += 1
                     st.session_state.user_events.append(event)
                     st.info("Playing track. Event sent to Kafka.")
+                
+                # Load another track after like
+                load_new_track(conn)
+                st.rerun()
 
         with col2:
             if st.button("Like", icon="✅"):

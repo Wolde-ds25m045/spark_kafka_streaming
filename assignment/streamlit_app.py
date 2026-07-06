@@ -114,6 +114,81 @@ def get_recommendations_by_genre(conn, track, limit=5):
     return [dict(row) for row in recommendations]
 
 
+
+# ranked recommendations based on Kafka preferences
+def get_ranked_recommendations(conn, preferences, seen_track_ids=None, limit=5):
+    
+    seen_track_ids = seen_track_ids or set()
+
+    favorite_genre = preferences.get("favorite_genre")
+    favorite_artist = preferences.get("favorite_artist")
+    favorite_album = preferences.get("favorite_album")
+
+    favorite_genre_id = favorite_genre.get("id") if favorite_genre else None
+    favorite_artist_id = favorite_artist.get("id") if favorite_artist else None
+    favorite_album_id = favorite_album.get("id") if favorite_album else None
+
+    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute("""
+            SELECT
+                t.id AS track_id,
+                t.name AS track_name,
+                t.milliseconds,
+                t.unit_price,
+                al.id AS album_id,
+                al.title AS album_name,
+                a.id AS artist_id,
+                a.name AS artist_name,
+                g.id AS genre_id,
+                g.name AS genre_name
+            FROM public.tracks t
+            JOIN public.albums al ON t.album_id = al.id
+            JOIN public.artists a ON al.artist_id = a.id
+            LEFT JOIN public.genres g ON t.genre_id = g.id
+            ORDER BY random()
+            LIMIT 300;
+        """)
+        candidates = [dict(row) for row in cur.fetchall()]
+
+    prices = [
+        float(track["unit_price"])
+        for track in candidates
+        if track.get("unit_price") is not None
+    ]
+    max_price = max(prices) if prices else 1.0
+
+    ranked_tracks = []
+
+    for track in candidates:
+        if track["track_id"] in seen_track_ids:
+            continue
+
+        genre_match = 1 if favorite_genre_id is not None and track["genre_id"] == favorite_genre_id else 0
+        artist_match = 1 if favorite_artist_id is not None and track["artist_id"] == favorite_artist_id else 0
+        album_match = 1 if favorite_album_id is not None and track["album_id"] == favorite_album_id else 0
+
+        price = float(track["unit_price"]) if track.get("unit_price") is not None else 0.0
+        price_score = price / max_price if max_price > 0 else 0.0
+
+        recommendation_score = (
+            3.0 * genre_match
+            + 2.0 * artist_match
+            + 1.0 * album_match
+            + 0.5 * price_score
+        )
+
+        track["recommendation_score"] = recommendation_score
+        ranked_tracks.append(track)
+
+    ranked_tracks.sort(
+        key=lambda track: track["recommendation_score"],
+        reverse=True
+    )
+
+    return ranked_tracks[:limit]
+
+
+
 def get_favorite_genre_from_events(events):
     genre_scores = {}
 
@@ -345,6 +420,8 @@ def main():
         st.session_state.user_events = []
         st.rerun()
 
+    processed_user_recommendation = None
+
     if st.session_state.action_count < 10:
         st.info("Interact with at least 10 tracks to unlock recommendations.")
     else:
@@ -381,28 +458,55 @@ def main():
         else:
             st.info("The external Kafka processor has not written recommendations for this user yet.")
 
-        favorite_genre = get_favorite_genre_from_events(st.session_state.user_events)
+        seen_track_ids = {
+            event["track_id"]
+            for event in st.session_state.user_events
+            if event.get("track_id") is not None
+        }
 
-        if favorite_genre:
-            recommendation_seed_track = {
-                "genre_id": favorite_genre["genre_id"],
-                "track_id": track["track_id"],
-            }
-            recommendations = get_recommendations_by_genre(conn, recommendation_seed_track)
-            st.write(
-                f"Based on your interactions, your strongest genre is: "
-                f"**{favorite_genre['genre_name']}**"
+        if processed_user_recommendation and processed_user_recommendation.get("preferences"):
+            preferences = processed_user_recommendation["preferences"]
+
+            recommendations = get_ranked_recommendations(
+                conn=conn,
+                preferences=preferences,
+                seen_track_ids=seen_track_ids,
+                limit=5
             )
-        else:
-            recommendations = get_recommendations_by_genre(conn, track)
 
-        st.subheader("Recommended tracks from your preferred genre")
+            st.subheader("Ranked recommendations based on Kafka preferences")
+            st.caption(
+                "Ranking uses favorite genre, artist, album, and a small unit-price boost "
+                "to reflect the revenue objective."
+            )
+
+        else:
+            favorite_genre = get_favorite_genre_from_events(st.session_state.user_events)
+
+            if favorite_genre:
+                recommendation_seed_track = {
+                    "genre_id": favorite_genre["genre_id"],
+                    "track_id": track["track_id"],
+                }
+                recommendations = get_recommendations_by_genre(conn, recommendation_seed_track)
+                st.write(
+                    f"Fallback recommendation based on local session genre: "
+                    f"**{favorite_genre['genre_name']}**"
+                )
+            else:
+                recommendations = get_recommendations_by_genre(conn, track)
+
+            st.subheader("Fallback recommendations from preferred genre")
 
         for rec in recommendations:
+            score_text = ""
+            if "recommendation_score" in rec:
+                score_text = f" — Score: {rec['recommendation_score']:.2f}"
+
             st.write(
                 f"**{rec['track_name']}** by {rec['artist_name']} "
                 f"— Album: {rec['album_name']} — Genre: {rec['genre_name']} "
-                f"— Price: ${rec['unit_price']}"
+                f"— Price: ${rec['unit_price']}{score_text}"
             )
 
 

@@ -170,3 +170,6 @@ streaming-app/
 spark-warehouse/
 
 *.db
+
+
+recommendations.json

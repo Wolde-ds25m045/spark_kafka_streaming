@@ -1,0 +1,131 @@
+{
+  "user_ea3ade8c": {
+    "event_count": 20,
+    "message": "User has enough interactions for recommendations.",
+    "latest_event": {
+      "user_id": "user_ea3ade8c",
+      "track_id": 2937,
+      "action_type": "Skip",
+      "timestamp": "2026-07-05T16:52:17.369658+00:00",
+      "track_name": "Love Is Blindness",
+      "artist_id": 150,
+      "artist_name": "U2",
+      "album_id": 232,
+      "album_name": "Achtung Baby",
+      "track_length_ms": 263497,
+      "unit_price": 0.99
+    }
+  },
+  "user_0629d915": {
+    "event_count": 11,
+    "message": "User has enough interactions for recommendations.",
+    "latest_event": {
+      "user_id": "user_0629d915",
+      "track_id": 1484,
+      "action_type": "Play",
+      "timestamp": "2026-07-06T08:54:49.924532+00:00",
+      "track_name": "I Don't Live Today",
+      "artist_id": 94,
+      "artist_name": "Jimi Hendrix",
+      "album_id": 120,
+      "album_name": "Are You Experienced?",
+      "genre_id": 1,
+      "genre_name": "Rock",
+      "track_length_ms": 235311,
+      "unit_price": 0.99
+    }
+  },
+  "user_6bc347b2": {
+    "event_count": 11,
+    "message": "User has enough interactions for recommendations.",
+    "latest_event": {
+      "user_id": "user_6bc347b2",
+      "track_id": 1192,
+      "action_type": "Play",
+      "timestamp": "2026-07-06T08:56:23.192266+00:00",
+      "track_name": "L'Arc En Ciel De Miles",
+      "artist_id": 89,
+      "artist_name": "Incognito",
+      "album_id": 93,
+      "album_name": "Blue Moods",
+      "genre_id": 2,
+      "genre_name": "Jazz",
+      "track_length_ms": 242390,
+      "unit_price": 0.99
+    }
+  },
+  "user_746e6441": {
+    "event_count": 10,
+    "message": "User has enough interactions for recommendations.",
+    "latest_event": {
+      "user_id": "user_746e6441",
+      "track_id": 2954,
+      "action_type": "Like",
+      "timestamp": "2026-07-06T09:08:31.960753+00:00",
+      "track_name": "Dancing Barefoot",
+      "artist_id": 150,
+      "artist_name": "U2",
+      "album_id": 234,
+      "album_name": "B-Sides 1980-1990",
+      "genre_id": 1,
+      "genre_name": "Rock",
+      "track_length_ms": 287895,
+      "unit_price": 0.99
+    }
+  },
+  "user_8eec8480": {
+    "event_count": 19,
+    "message": "User has enough interactions for recommendations.",
+    "latest_event": {
+      "user_id": "user_8eec8480",
+      "track_id": 2002,
+      "action_type": "Like",
+      "timestamp": "2026-07-06T10:27:24.658985+00:00",
+      "track_name": "Blew",
+      "artist_id": 110,
+      "artist_name": "Nirvana",
+      "album_id": 163,
+      "album_name": "From The Muddy Banks Of The Wishkah [Live]",
+      "genre_id": 1,
+      "genre_name": "Rock",
+      "track_length_ms": 216346,
+      "unit_price": 0.99
+    }
+  },
+  "user_6a5730c0": {
+    "event_count": 14,
+    "message": "User has enough interactions for recommendations.",
+    "preferences": {
+      "favorite_genre": {
+        "id": 9,
+        "name": "Pop",
+        "score": 8
+      },
+      "favorite_artist": {
+        "id": 21,
+        "name": "Various artistss",
+        "score": 4
+      },
+      "favorite_album": {
+        "id": 29,
+        "name": "Ax\u00e9 Bahia 2001",
+        "score": 4
+      }
+    },
+    "latest_event": {
+      "user_id": "user_6a5730c0",
+      "track_id": 3260,
+      "action_type": "Like",
+      "timestamp": "2026-07-06T11:26:37.259119+00:00",
+      "track_name": "Gimme Some Truth",
+      "artist_id": 150,
+      "artist_name": "U2",
+      "album_id": 255,
+      "album_name": "Instant Karma: The Amnesty International Campaign to Save Darfur",
+      "genre_id": 9,
+      "genre_name": "Pop",
+      "track_length_ms": 232778,
+      "unit_price": 0.99
+    }
+  }
+}
